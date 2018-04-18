@@ -14,4 +14,4 @@
     (.triggerRelease synth freq)))
 
 (defn stop [synth]
-  (.triggRelease synth))
+  (.triggerRelease synth))

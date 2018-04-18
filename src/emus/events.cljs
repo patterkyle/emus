@@ -23,6 +23,31 @@
                        :a4-freq (:synth/a4-freq db)
                        :tuning (:synth/tuning db)}}))
 
+(defn note-equal? [note-a note-b]
+  (and (= (:pitch-class note-a) (:pitch-class note-b))
+       (= (:octave note-a) (:octave note-b))))
+
+(defn get-synth [notes note]
+  (:synth (first (filter (partial note-equal? note) notes))))
+
+(re-frame/reg-event-fx
+ :synth/stop-note
+ (fn-traced [{:keys [db]} [_ note]]
+   (let [synth (get-synth (:synth/notes db) note)]
+     {:db (assoc db :synth/notes
+                 (into #{}
+                       (remove (partial note-equal? note) (:synth/notes db))))
+      :synth/stop-note! {:synth synth
+                         :note note
+                         :a4-freq (:synth/a4-freq db)
+                         :tuning (:synth/tuning db)}})))
+
+(re-frame/reg-event-fx
+ :synth/stop-all
+ (fn-traced [{:keys [db]} [_]]
+   {:db (assoc db :synth/notes #{})
+    :synth/stop-all! (:synth/synths db)}))
+
 (re-frame/reg-fx
  :synth/play-note!
  (fn [{:keys [synth note a4-freq tuning]}]
@@ -34,7 +59,7 @@
    (synth/stop-note synth note a4-freq tuning)))
 
 (re-frame/reg-fx
- :synth/stop!
+ :synth/stop-all!
  (fn [synths]
    (doseq [synth synths]
      (synth/stop synth))))
