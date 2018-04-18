@@ -3,6 +3,8 @@
             [re-frame.core :as re-frame]
             [emus.events :as events]
             [emus.subs :as subs]
+            [emus.cofx :as cofx]
+            [emus.synth :as synth]
             [emus.views :as views]))
 
 (defn ^:dev/after-load start []
