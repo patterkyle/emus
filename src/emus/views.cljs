@@ -1,6 +1,7 @@
 (ns emus.views
   (:require [reagent.core :as reagent]
-            [re-frame.core :as re-frame]))
+            [re-frame.core :as re-frame]
+            [emus.keyboard :as keyboard]))
 
 (defn welcome-message []
   (let [app-name (re-frame/subscribe [:app-name])]
@@ -9,4 +10,5 @@
 
 (defn main-panel []
   [:div {:class "main-panel"}
-   [welcome-message]])
+   [welcome-message]
+   [keyboard/keyboard]])

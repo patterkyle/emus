@@ -30,3 +30,8 @@
  :synth/index
  (fn [db]
    (:synth/index db)))
+
+(re-frame/reg-sub
+ :synth/sustain?
+ (fn [db]
+   (:synth/sustain? db)))

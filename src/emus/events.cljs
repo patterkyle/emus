@@ -9,6 +9,8 @@
  (fn-traced [_ _]
    db/default-db))
 
+;; synth
+
 (re-frame/reg-event-fx
  :synth/play-note
  [(re-frame/inject-cofx :synth/current-synth)]
@@ -28,7 +30,7 @@
        (= (:octave note-a) (:octave note-b))))
 
 (defn get-synth [notes note]
-  (:synth (first (filter (partial note-equal? note) notes))))
+  (:synth (first (filter #(note-equal? note %) notes))))
 
 (re-frame/reg-event-fx
  :synth/stop-note
@@ -47,6 +49,39 @@
  (fn-traced [{:keys [db]} [_]]
    {:db (assoc db :synth/notes #{})
     :synth/stop-all! (:synth/synths db)}))
+
+;; keyboard
+
+(defn parse-note-name [note-name]
+  (let [note-regex #"^([A-G]#?)(\d)$"
+        [_ note-name' octave] (re-matches note-regex note-name)
+        notes (zipmap ["C" "C#" "D" "D#" "E" "F" "F#" "G" "G#" "A" "A#" "B"]
+                      (range 12))]
+    {:pitch-class (notes note-name')
+     :octave (js/parseInt octave)}))
+
+(re-frame/reg-event-fx
+ :keyboard/keydown
+ (fn-traced [cofx [_ note-name]]
+   (let [note (parse-note-name note-name)]
+     {:db (:db cofx)
+      :dispatch [:synth/play-note note]})))
+
+(re-frame/reg-event-fx
+ :keyboard/keyup
+ (fn-traced [cofx [_ note-name]]
+   (let [note (parse-note-name note-name)]
+     {:db (:db cofx)
+      :dispatch [:synth/stop-note note]})))
+
+(re-frame/reg-event-fx
+ :keyboard/stop-button-click
+ [(re-frame/inject-cofx :synth/synths)]
+ (fn-traced [cofx _]
+   {:db (:db cofx)
+    :dispatch [:synth/stop-all (:synth/synths cofx)]}))
+
+;; effects
 
 (re-frame/reg-fx
  :synth/play-note!

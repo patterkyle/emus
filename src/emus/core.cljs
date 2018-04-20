@@ -5,6 +5,7 @@
             [emus.subs :as subs]
             [emus.cofx :as cofx]
             [emus.synth :as synth]
+            [emus.keyboard :as keyboard]
             [emus.views :as views]))
 
 (defn ^:dev/after-load start []
