@@ -3,14 +3,19 @@
             [re-frame.core :as re-frame]
             ["qwerty-hancock" :as qwerty-hancock]))
 
+(defn stop-button []
+  [:button {:on-click #(re-frame/dispatch [:keyboard/stop-button-click])}
+   "Stop"])
+
+(defn sustain-checkbox []
+  [:div {:class "sustain-checkbox"}
+   [:label "Sustain: "]
+   [:input {:type "checkbox"
+            :on-change #(re-frame/dispatch [:keyboard/sustain-change])}]])
+
 (defn keyboard-inner []
   (reagent/create-class
-   {:reagent-render (fn [] [:div
-                            [:div {:id "qwerty-hancock"}]
-                            [:button {:on-click
-                                      #(re-frame/dispatch
-                                        [:keyboard/stop-button-click])}
-                             "Stop"]])
+   {:reagent-render (fn [] [:div {:id "qwerty-hancock"}])
     :component-did-mount
     (fn [_]
       (let [qh (new qwerty-hancock/QwertyHancock
@@ -24,4 +29,6 @@
 
 (defn keyboard []
   [:div {:id "keyboard"}
-   [keyboard-inner]])
+   [keyboard-inner]
+   [sustain-checkbox]
+   [stop-button]])

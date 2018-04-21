@@ -35,14 +35,17 @@
 (re-frame/reg-event-fx
  :synth/stop-note
  (fn-traced [{:keys [db]} [_ note]]
-   (let [synth (get-synth (:synth/notes db) note)]
-     {:db (assoc db :synth/notes
-                 (into #{}
-                       (remove (partial note-equal? note) (:synth/notes db))))
-      :synth/stop-note! {:synth synth
-                         :note note
-                         :a4-freq (:synth/a4-freq db)
-                         :tuning (:synth/tuning db)}})))
+   (let [synth (get-synth (:synth/notes db) note)
+         effect (if-not (:synth/sustain? db)
+                  {:synth/stop-note! {:synth synth
+                                      :note note
+                                      :a4-freq (:synth/a4-freq db)
+                                      :tuning (:synth/tuning db)}})]
+     (merge {:db (assoc db :synth/notes
+                        (into #{}
+                              (remove (partial note-equal? note)
+                                      (:synth/notes db))))}
+            effect))))
 
 (re-frame/reg-event-fx
  :synth/stop-all
@@ -80,6 +83,12 @@
  (fn-traced [cofx _]
    {:db (:db cofx)
     :dispatch [:synth/stop-all (:synth/synths cofx)]}))
+
+(re-frame/reg-event-fx
+ :keyboard/sustain-change
+ (fn-traced [{:keys [db]} _]
+   {:db (update db :synth/sustain? not)
+    :dispatch [:synth/stop-all nil]}))
 
 ;; effects
 
