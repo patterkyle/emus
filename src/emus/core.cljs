@@ -1,12 +1,10 @@
 (ns emus.core
   (:require [reagent.core :as reagent]
             [re-frame.core :as re-frame]
-            [emus.events :as events]
-            [emus.subs :as subs]
-            [emus.cofx :as cofx]
-            [emus.synth :as synth]
-            [emus.keyboard :as keyboard]
-            [emus.views :as views]))
+            [emus.views.main :as views]
+            [emus.events.main]
+            [emus.subs]
+            [emus.synth]))
 
 (defn ^:dev/after-load start []
   (re-frame/dispatch-sync [:initialize-db])

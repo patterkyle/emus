@@ -1,7 +1,6 @@
-(ns emus.views
-  (:require [reagent.core :as reagent]
-            [re-frame.core :as re-frame]
-            [emus.keyboard :as keyboard]))
+(ns emus.views.main
+  (:require [re-frame.core :as re-frame]
+            [emus.views.keyboard :as keyboard]))
 
 (defn welcome-message []
   (let [app-name (re-frame/subscribe [:app-name])]

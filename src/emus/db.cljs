@@ -11,4 +11,4 @@
    :synth/count synth-count
    :synth/synths (synth/make-synths synth-count)
    :synth/index 0
-   :synth/sustain? false})
+   :synth/sustain? true})

@@ -8,9 +8,3 @@
          synth-index (re-frame/subscribe [:synth/index])]
      (assoc cofx :synth/current-synth
             (nth @synths @synth-index)))))
-
-(re-frame/reg-cofx
- :synth/synths
- (fn [cofx _]
-   (let [synths (re-frame/subscribe [:synth/synths])]
-     (assoc cofx :synth/synths @synths))))
