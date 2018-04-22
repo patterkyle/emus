@@ -5,8 +5,9 @@
 
 (def default-db
   {:app-name "emus"
+
    :synth/a4-freq 440
-   :synth/tuning :equal
+   :synth/temperament :equal
    :synth/notes #{}
    :synth/count synth-count
    :synth/synths (synth/make-synths synth-count)

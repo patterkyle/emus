@@ -7,9 +7,9 @@
    (:app-name db)))
 
 (re-frame/reg-sub
- :synth/tuning
+ :synth/temperament
  (fn [db]
-   (:synth/tuning db)))
+   (:synth/temperament db)))
 
 (re-frame/reg-sub
  :synth/a4-freq

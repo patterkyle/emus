@@ -15,10 +15,12 @@
 
 (def equal-intervals (mapv #(js/Math.pow 2 (/ % 12)) (range 13)))
 
-(def tunings {:just just-intervals
-              :pythagorean pythagorean-intervals
-              :quarter-comma quarter-comma-intervals
-              :equal equal-intervals})
+(defn get-intervals [temperament]
+  (case temperament
+    :just just-intervals
+    :pythagorean pythagorean-intervals
+    :quarter-comma quarter-comma-intervals
+    :equal equal-intervals))
 
 (defn frequency [root-freq half-steps intervals]
   (let [pitch-class (mod (+ (mod half-steps 12) 12) 12)
@@ -29,8 +31,8 @@
 (defn- half-steps-from-d4 [{:keys [pitch-class octave]}]
   (+ (- pitch-class 2) (* (- octave 4) 12)))
 
-(defn note-frequency [note a4-freq tuning]
-  (let [intervals (tunings tuning)
+(defn note-frequency [note a4-freq temperament]
+  (let [intervals (get-intervals temperament)
         d4-freq (* a4-freq (/ 1 (nth intervals 7)))
         half-steps (half-steps-from-d4 note)]
     (frequency d4-freq half-steps intervals)))

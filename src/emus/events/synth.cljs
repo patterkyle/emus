@@ -15,16 +15,14 @@
     :synth/play-note! {:synth (:synth/current-synth cofx)
                        :note note
                        :a4-freq (:synth/a4-freq db)
-                       :tuning (:synth/tuning db)}}))
+                       :temperament (:synth/temperament db)}}))
 
 (defn note-equal? [note-a note-b]
   (and (= (:pitch-class note-a) (:pitch-class note-b))
        (= (:octave note-a) (:octave note-b))))
 
 (defn get-synth [notes note]
-  (-> (filter (partial note-equal? note) notes)
-      first
-      :synth))
+  (-> (filter (partial note-equal? note) notes) first :synth))
 
 (re-frame/reg-event-fx
  :synth/stop-note
@@ -33,7 +31,7 @@
      {:db (assoc db :synth/notes
                  (into #{}
                        (remove (partial note-equal? note) (:synth/notes db))))
-      :synth/stop-note! {:synth synth}})))
+      :synth/stop-synth! synth})))
 
 (re-frame/reg-event-fx
  :synth/stop-all
@@ -45,32 +43,32 @@
  :synth/a4-freq-change
  (fn-traced [{:keys [db]} [_ new-a4-freq]]
    {:db (assoc db :synth/a4-freq new-a4-freq)
-    :dispatch [:synth/retune new-a4-freq (:synth/tuning db)]}))
+    :dispatch [:synth/retune new-a4-freq (:synth/temperament db)]}))
 
 (re-frame/reg-event-fx
- :synth/tuning-change
- (fn-traced [{:keys [db]} [_ new-tuning]]
-   {:db (assoc db :synth/tuning new-tuning)
-    :dispatch [:synth/retune (:synth/a4-freq db) new-tuning]}))
+ :synth/temperament-change
+ (fn-traced [{:keys [db]} [_ new-temperament]]
+   {:db (assoc db :synth/temperament new-temperament)
+    :dispatch [:synth/retune (:synth/a4-freq db) new-temperament]}))
 
 (re-frame/reg-event-fx
  :synth/retune
- (fn-traced [{:keys [db]} [_ a4-freq tuning]]
+ (fn-traced [{:keys [db]} [_ a4-freq temperament]]
    {:db db
     :synth/retune! {:notes (:synth/notes db)
                     :a4-freq a4-freq
-                    :tuning tuning}}))
+                    :temperament temperament}}))
 
 ;; effects
 
 (re-frame/reg-fx
  :synth/play-note!
- (fn [{:keys [synth note a4-freq tuning]}]
-   (synth/play-note synth note a4-freq tuning)))
+ (fn [{:keys [synth note a4-freq temperament]}]
+   (synth/play-note synth note a4-freq temperament)))
 
 (re-frame/reg-fx
- :synth/stop-note!
- (fn [{:keys [synth]}]
+ :synth/stop-synth!
+ (fn [synth]
    (synth/stop synth)))
 
 (re-frame/reg-fx
@@ -81,7 +79,6 @@
 
 (re-frame/reg-fx
  :synth/retune!
- (fn [{:keys [notes a4-freq tuning]}]
+ (fn [{:keys [notes a4-freq temperament]}]
    (doseq [note notes]
-     (synth/retune (:synth note) note a4-freq tuning))))
-
+     (synth/retune (:synth note) note a4-freq temperament))))
