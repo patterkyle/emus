@@ -35,3 +35,8 @@
  :synth/sustain?
  (fn [db]
    (:synth/sustain? db)))
+
+(re-frame/reg-sub
+ :synth/oscillator
+ (fn [db]
+   (:synth/oscillator db)))

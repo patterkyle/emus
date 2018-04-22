@@ -40,6 +40,14 @@
     :synth/stop-all! (:synth/synths db)}))
 
 (re-frame/reg-event-fx
+ :synth/retune
+ (fn-traced [{:keys [db]} [_ a4-freq temperament]]
+   {:db db
+    :synth/retune! {:notes (:synth/notes db)
+                    :a4-freq a4-freq
+                    :temperament temperament}}))
+
+(re-frame/reg-event-fx
  :synth/a4-freq-change
  (fn-traced [{:keys [db]} [_ new-a4-freq]]
    {:db (assoc db :synth/a4-freq new-a4-freq)
@@ -52,19 +60,18 @@
     :dispatch [:synth/retune (:synth/a4-freq db) new-temperament]}))
 
 (re-frame/reg-event-fx
- :synth/retune
- (fn-traced [{:keys [db]} [_ a4-freq temperament]]
-   {:db db
-    :synth/retune! {:notes (:synth/notes db)
-                    :a4-freq a4-freq
-                    :temperament temperament}}))
+ :synth/oscillator-change
+ (fn-traced [{:keys [db]} [_ new-oscillator]]
+   {:db (assoc db :synth/oscillator new-oscillator)
+    :synth/set-oscillator! {:synths (:synth/synths db)
+                            :oscillator new-oscillator}}))
 
 ;; effects
 
 (re-frame/reg-fx
  :synth/play-note!
  (fn [{:keys [synth note a4-freq temperament]}]
-   (synth/play-note synth note a4-freq temperament)))
+   (synth/play-note synth note {:a4-freq a4-freq :temperament temperament})))
 
 (re-frame/reg-fx
  :synth/stop-synth!
@@ -82,3 +89,9 @@
  (fn [{:keys [notes a4-freq temperament]}]
    (doseq [note notes]
      (synth/retune (:synth note) note a4-freq temperament))))
+
+(re-frame/reg-fx
+ :synth/set-oscillator!
+ (fn [{:keys [synths oscillator]}]
+   (doseq [synth synths]
+     (synth/set-oscillator synth oscillator))))

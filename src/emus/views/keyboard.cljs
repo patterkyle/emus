@@ -37,6 +37,18 @@
     [:option {:value "quarter-comma"} "quarter-comma"]
     [:option {:value "equal"} "equal"]]])
 
+(defn oscillator-select [oscillator]
+  [:div {:class "oscillator-select"}
+   [:label "Oscillator: "]
+   [:select {:value oscillator
+             :on-change #(re-frame/dispatch
+                          [:synth/oscillator-change
+                           (-> % .-target .-value keyword)])}
+    [:option {:value "sine"} "sine"]
+    [:option {:value "triangle"} "triangle"]
+    [:option {:value "sawtooth"} "sawtooth"]
+    [:option {:value "square"} "square"]]])
+
 (defn qwerty-hancock []
   (let [keyboard-id "qwerty-hancock"
         width 600
@@ -59,10 +71,12 @@
 (defn keyboard []
   (let [sustain? (re-frame/subscribe [:synth/sustain?])
         a4-freq (re-frame/subscribe [:synth/a4-freq])
-        temperament (re-frame/subscribe [:synth/temperament])]
+        temperament (re-frame/subscribe [:synth/temperament])
+        oscillator (re-frame/subscribe [:synth/oscillator])]
     [:div {:id "keyboard"}
      [qwerty-hancock]
      [sustain-checkbox @sustain?]
      [a4-freq-input @a4-freq]
      [temperament-select @temperament]
+     [oscillator-select @oscillator]
      [stop-button]]))
